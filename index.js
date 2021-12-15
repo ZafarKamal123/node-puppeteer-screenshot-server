@@ -6,7 +6,7 @@ const express = require('express'),
 
 app.use(express.json());
 
-app.get("/", async (request, response) => {
+app.post("/", async (request, response) => {
     
     const browser = await puppeteer.launch({
         args: [
