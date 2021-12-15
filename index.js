@@ -8,7 +8,7 @@ app.get("/", async (request, response) => {
     try {
 
         const browser = await puppeteer.launch({
-            args: ['--no-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
             headless: true
         });
         const page = await browser.newPage();
