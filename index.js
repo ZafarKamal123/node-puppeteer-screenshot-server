@@ -4,12 +4,52 @@ const express = require('express'),
     app = express(),
     puppeteer = require('puppeteer');
 
+app.use(express.json());
+
 app.get("/", async (request, response) => {
     try {
 
         const browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            headless: true
+            args: [
+                '--disable-setuid-sandbox',
+                '--autoplay-policy=user-gesture-required',
+                '--disable-background-networking',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-breakpad',
+                '--disable-client-side-phishing-detection',
+                '--disable-component-update',
+                '--disable-default-apps',
+                '--disable-dev-shm-usage',
+                '--disable-domain-reliability',
+                '--disable-extensions',
+                '--disable-features=AudioServiceOutOfProcess',
+                '--disable-hang-monitor',
+                '--disable-ipc-flooding-protection',
+                '--disable-notifications',
+                '--disable-offer-store-unmasked-wallet-cards',
+                '--disable-popup-blocking',
+                '--disable-print-preview',
+                '--disable-prompt-on-repost',
+                '--disable-renderer-backgrounding',
+                '--disable-setuid-sandbox',
+                '--disable-speech-api',
+                '--disable-sync',
+                '--hide-scrollbars',
+                '--ignore-gpu-blacklist',
+                '--metrics-recording-only',
+                '--mute-audio',
+                '--no-default-browser-check',
+                '--no-first-run',
+                '--no-pings',
+                '--no-sandbox',
+                '--no-zygote',
+                '--password-store=basic',
+                '--use-gl=swiftshader',
+                '--use-mock-keychain',
+            ],
+            headless: true,
+            userDataDir: './cache'
         });
         const page = await browser.newPage();
 
@@ -18,15 +58,15 @@ app.get("/", async (request, response) => {
             height: 1080
         })
 
-        await page.goto(request.query.url); // Read url query parameter.
+        await page.goto(request.body.url, { waitUntil: 'networkidle0', timeout: 300000 }); // Read url query parameter.
 
-        const hasTarget = typeof request.query.target !== 'undefined';
+        const hasTarget = typeof request.body.target !== 'undefined';
         let image;
 
         if (!hasTarget) {
             image = await page.screenshot({ fullPage: true });
         } else {
-            const targetElement = (await page.$(request.query.target)) || null;
+            const targetElement = (await page.$(request.body.target)) || null;
 
             if (!targetElement) {
                 return res.status(404).json({ message: 'element not found on page' });
