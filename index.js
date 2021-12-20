@@ -2,11 +2,14 @@ const res = require('express/lib/response');
 
 const express = require('express'),
     app = express(),
-    puppeteer = require('puppeteer');
+    puppeteer = require('puppeteer'),
+    RequestQ = require('express-request-queue');
 
 app.use(express.json());
 
-app.post("/", async (request, response) => {
+const q = new RequestQ();
+
+app.post("/", q.run(async (request, response) => {
     
     const browser = await puppeteer.launch({
         args: [
@@ -85,7 +88,7 @@ app.post("/", async (request, response) => {
     } finally {
         browser.close();
     }
-});
+}));
 
 const listener = app.listen(3000, function () {
     console.log('Your app is listening on port ' + listener.address().port);
